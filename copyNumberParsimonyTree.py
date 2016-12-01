@@ -54,8 +54,27 @@ def backtrack(rootNode):
 
     return rootNode
 
+def setupTree(leafNodeList):
+    rootNode = {}
+    pointerQueue = [rootNode]
+
+    while len(pointerQueue) != len(leafNodeList):
+        pointer = pointerQueue.pop(0)
+        leftNode = {'parent': pointer}
+        rightNode = {'parent': pointer}
+        pointer['left'] = leftNode
+        pointer['right'] = rightNode
+        pointerQueue.append(leftNode)
+        pointerQueue.append(rightNode)
+
+    for i in range(len(leafNodeList)):
+        pointerQueue[i]['name'] = leafNodeList[i]['name']
+        pointerQueue[i]['state'] = [leafNodeList[i]['state']]
+
+    return rootNode
+
 def printTree(rootNode, id):
-    #Prints the tree in post order
+    #Prints the tree in postorder
 
     if 'left' in rootNode:
         printTree(rootNode['left'], "LEFT")
@@ -63,7 +82,11 @@ def printTree(rootNode, id):
     if 'right' in rootNode:
         printTree(rootNode['right'], "RIGHT")
 
-    print("BacktrackState: " + str(rootNode['backtrackState']))
+    if 'name' in rootNode:
+        print("Name: " + rootNode['name'] + " \tBacktrackState: " + str(rootNode['backtrackState']))
+
+    else:
+        print("BacktrackState: " + str(rootNode['backtrackState']))
 
 def testCalculateParsimonyScore():
     rootNode = {}
@@ -85,9 +108,14 @@ def testCalculateParsimonyScore3Levels():
     print(calculateParsimonyScore(rootNode))
     return rootNode
 
+def testTreeSetup():
+    leaves = [{'name': "FIRST", 'state':1},{'name': "SECOND", 'state':2},{'name': "THIRD", 'state':3}]
+    rootNode = setupTree(leaves)
+    return rootNode
 
 if __name__ == "__main__":
-    rootNode = testCalculateParsimonyScore3Levels()
+    rootNode = testTreeSetup()
+    calculateParsimonyScore(rootNode)
     rootNode = backtrack(rootNode)
     printTree(rootNode, "ROOT")
 
