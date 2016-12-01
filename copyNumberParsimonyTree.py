@@ -1,4 +1,4 @@
-import json
+import itertools
 
 def calculateParsimonyScore(rootNode):
     parsimonyScore = 0
@@ -73,20 +73,21 @@ def setupTree(leafNodeList):
 
     return rootNode
 
-def printTree(rootNode, id):
+def printTree(rootNode):
     #Prints the tree in postorder
-
     if 'left' in rootNode:
-        printTree(rootNode['left'], "LEFT")
+        printTree(rootNode['left'])
 
     if 'right' in rootNode:
-        printTree(rootNode['right'], "RIGHT")
+        printTree(rootNode['right'])
 
     if 'name' in rootNode:
         print("Name: " + rootNode['name'] + " \tBacktrackState: " + str(rootNode['backtrackState']))
 
     else:
         print("BacktrackState: " + str(rootNode['backtrackState']))
+
+## TESTS
 
 def testCalculateParsimonyScore():
     rootNode = {}
@@ -113,10 +114,39 @@ def testTreeSetup():
     rootNode = setupTree(leaves)
     return rootNode
 
+## ANALYSIS
+
+def nineSpecieAnalysis():
+    species = [
+        {'name': "Evasterias troschelii", 'state': 14.83},
+        {'name': "Dermasterias imbricata", 'state': 58.42},
+        {'name': "Meridiastra calcar", 'state': 49.42},
+        {'name': "Patiria pectinifera", 'state': 0},
+        {'name': "Cryptasterina hystera", 'state': 7.66},
+        {'name': "Cryptasterina pentagona", 'state': 47.33},
+        {'name': "Parvulastra parvivipara", 'state': 55.33},
+        {'name': "Parvulastra vivipara", 'state': 52.3},
+        {'name': "Parvulastra exigua", 'state': 60.84},
+    ]
+
+    minScore = 9999
+    minTree = None
+
+    for permutation in itertools.permutations(species):
+        tree = setupTree(permutation)
+        score = calculateParsimonyScore(tree)
+        print("Score for this run: " + str(score))
+        if score < minScore:
+            minScore = score
+            minTree = tree
+
+    print("Backtracking and printing on tree with lowest score: " + str(minScore))
+
+    rootNode = backtrack(minTree)
+    printTree(rootNode)
+
+
 if __name__ == "__main__":
-    rootNode = testTreeSetup()
-    calculateParsimonyScore(rootNode)
-    rootNode = backtrack(rootNode)
-    printTree(rootNode, "ROOT")
+    nineSpecieAnalysis()
 
 
