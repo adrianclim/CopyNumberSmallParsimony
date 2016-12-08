@@ -79,7 +79,7 @@ def printTreeWrapper(rootNode, newickOutput=False, outputFile = None):
         if outputFile is None:
             print(newick.dumps(rootNode))
         else:
-            with open(outputFile, 'w') as out:
+            with open(outputFile, 'a') as out:
                 out.write(newick.dumps(rootNode) + "\n")
 
     else:
@@ -102,13 +102,18 @@ def runAnalysis(species, storeAllTrees=False, percentDifference=0.01, newickOutp
     minScore = 9999
     minTree = None
     allTrees = []
+    allTreesCount = 0
 
     for permutation in itertools.permutations(species):
         tree = setupNewickTree(permutation)
         score = calculateParsimonyScore(tree)
         print("Score for this run: " + str(score))
         if storeAllTrees:
-            allTrees.append([tree, score])
+            allTreesCount += 1
+
+            # Gotta save some memory to prevent thrashing
+            if abs(score - minScore) <= (minScore*percentDifference):
+                allTrees.append([tree, score])
 
         if score < minScore:
             minScore = score
@@ -126,7 +131,7 @@ def runAnalysis(species, storeAllTrees=False, percentDifference=0.01, newickOutp
         print(str.format("Printing trees with score within {} of smallest score", str(minScore*percentDifference)))
 
         print(str.format("Number of trees within threshold value: " + str(len(treesToPrint))))
-        print(str.format("Total number of trees generated: " + str(len(allTrees))))
+        print(str.format("Total number of trees generated: " + str(allTreesCount)))
         print(str.format("Printing all trees within {}% of minimum parsimony score found.", str(percentDifference)))
 
     else:
