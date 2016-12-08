@@ -112,21 +112,24 @@ def printTree(rootNode):
     else:
         print("BacktrackState: " + str(rootNode.backtrackstate))
 
-def bootstrapAnalysis(masterRootNode, treeSpace):
+def bootstrapAnalysis(masterRootNode, treeSpace, counter = 0):
+    print("Calculating bootstrap for node: " + str(counter))
     totalBootStrapValue = 0
 
     if len(masterRootNode.descendants) > 0:
         firstchildSet = set([i.name for i in masterRootNode.descendants[0].get_leaves()])
         secondChildSet = set([j.name for j in masterRootNode.descendants[1].get_leaves()])
 
+        counter = 0
         for tree in [k[0] for k in treeSpace]:
+            print("Searching tree: " + str(counter))
             if searchForNodeWithChildren(tree, firstchildSet, secondChildSet):
                 totalBootStrapValue += 1
 
         masterRootNode.bootstrapValue = totalBootStrapValue
 
     for l in masterRootNode.descendants:
-        bootstrapAnalysis(l, treeSpace)
+        bootstrapAnalysis(l, treeSpace, counter + 1)
 
 def searchForNodeWithChildren(currentNode, firstChildSet, secondChildSet):
     if currentNode.descendants is None or len(currentNode.descendants) == 0:
@@ -230,18 +233,18 @@ def testTreeSetup():
 
 def nineSpecieAnalysis():
     species = [
-        {'name': "Evasterias troschelii", 'state': 14.83},
-        {'name': "Dermasterias imbricata", 'state': 58.42},
-        {'name': "Meridiastra calcar", 'state': 49.42},
-        {'name': "Patiria pectinifera", 'state': 0},
-        {'name': "Cryptasterina hystera", 'state': 7.66},
-        {'name': "Cryptasterina pentagona", 'state': 47.33},
-        {'name': "Parvulastra parvivipara", 'state': 55.33},
-        {'name': "Parvulastra vivipara", 'state': 52.3},
-        {'name': "Parvulastra exigua", 'state': 60.84},
+        {'name': "Evasterias troschelii 'Gonochoric outcrossing'", 'state': 14.83},
+        {'name': "Dermasterias imbricata 'Gonochoric outcrossing'", 'state': 58.42},
+        {'name': "Meridiastra calcar 'Gonochoric outcrossing'", 'state': 49.42},
+        {'name': "Patiria pectinifera 'Gonochoric outcrossing'", 'state': 0},
+        {'name': "Cryptasterina hystera 'Hermaphroditic selfing'", 'state': 7.66},
+        {'name': "Cryptasterina pentagona 'Gonochoric outcrossing'", 'state': 47.33},
+        {'name': "Parvulastra parvivipara 'Hermaphroditic selfing'", 'state': 55.33},
+        {'name': "Parvulastra vivipara 'Hermaphroditic selfing'", 'state': 52.3},
+        {'name': "Parvulastra exigua 'Protandric selfing and outcrossing'", 'state': 60.84},
     ]
 
-    runAnalysis(species, percentDifference= 0.005, storeAllTrees=True, newickOutput=True, outputFile=None) #"copyNumberTrees.tree")
+    runAnalysis(species, percentDifference= 0.05, storeAllTrees=True, newickOutput=True, outputFile=None) #"copyNumberTrees.tree")
 
 if __name__ == "__main__":
     nineSpecieAnalysis()
