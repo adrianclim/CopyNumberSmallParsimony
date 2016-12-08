@@ -5,7 +5,21 @@ class CopyNumberNode(newick.Node):
     def __init__(self, copyNumber=None, **kw):
         self.copyNumber = [copyNumber]
         self.backtrackstate = []
+        self.bootstrapValue = None
         super(CopyNumberNode, self).__init__()
+
+    @property
+    def newick(self):
+        """The representation of the Node in Newick format."""
+        label = self.name or ''
+        if self.bootstrapValue is not None:
+            label += str(self.bootstrapValue)
+        if self._length:
+            label += ':' + self._length
+        descendants = ','.join([n.newick for n in self.descendants])
+        if descendants:
+            descendants = '(' + descendants + ')'
+        return descendants + label
 
 def calculateParsimonyScore(rootNode):
     parsimonyScore = 0
@@ -97,6 +111,9 @@ def printTree(rootNode):
 
     else:
         print("BacktrackState: " + str(rootNode.backtrackstate))
+
+#def bootstrapAnalysis(baseTree, treeSpace):
+
 
 def runAnalysis(species, storeAllTrees=False, percentDifference=0.01, newickOutput=False, outputFile = None):
     minScore = 9999
