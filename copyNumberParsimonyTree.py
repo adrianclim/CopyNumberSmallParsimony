@@ -112,8 +112,47 @@ def printTree(rootNode):
     else:
         print("BacktrackState: " + str(rootNode.backtrackstate))
 
-#def bootstrapAnalysis(baseTree, treeSpace):
+def bootstrapAnalysis(masterRootNode, treeSpace):
+    totalBootStrapValue = 0
 
+    if len(masterRootNode.descendants) > 0:
+        firstchildSet = set([i.name for i in masterRootNode.descendants[0].get_leaves()])
+        secondChildSet = set([j.name for j in masterRootNode.descendants[1].get_leaves()])
+
+        for tree in [k[0] for k in treeSpace]:
+            if searchForNodeWithChildren(tree, firstchildSet, secondChildSet):
+                totalBootStrapValue += 1
+
+        masterRootNode.bootstrapValue = totalBootStrapValue
+
+    for l in masterRootNode.descendants:
+        bootstrapAnalysis(l, treeSpace)
+
+def searchForNodeWithChildren(currentNode, firstChildSet, secondChildSet):
+    if currentNode.descendants is None or len(currentNode.descendants) == 0:
+        return False
+
+    leftCurrentNodeLeaves = set([i.name for i in currentNode.descendants[0].get_leaves()])
+    rightcurrentNodeLeaves = set([j.name for j in currentNode.descendants[1].get_leaves()])
+
+    print(firstChildSet)
+    print(secondChildSet)
+    print(leftCurrentNodeLeaves)
+    print(rightcurrentNodeLeaves)
+    print("space")
+
+    if leftCurrentNodeLeaves == firstChildSet and rightcurrentNodeLeaves == secondChildSet:
+        print("match")
+        return True
+
+    elif leftCurrentNodeLeaves == secondChildSet and rightcurrentNodeLeaves == firstChildSet:
+        print("match")
+        return True
+
+    elif len(currentNode.descendants)>0:
+        for i in currentNode.descendants:
+            if searchForNodeWithChildren(i, firstChildSet, secondChildSet):
+                return True
 
 def runAnalysis(species, storeAllTrees=False, percentDifference=0.01, newickOutput=False, outputFile = None):
     minScore = 9999
@@ -141,8 +180,10 @@ def runAnalysis(species, storeAllTrees=False, percentDifference=0.01, newickOutp
 
         for i in treesToPrint:
             print("Score for this tree: " + str(i[1]))
-            rootNode = backtrack(i[0])
-            printTreeWrapper(rootNode, newickOutput, outputFile=outputFile)
+            backtrack(i[0])
+
+        bootstrapAnalysis(minTree, treesToPrint)
+        printTreeWrapper(minTree, newickOutput, outputFile=outputFile)
 
         print("Smallest score: " + str(minScore))
         print(str.format("Printing trees with score within {} of smallest score", str(minScore*percentDifference)))
@@ -200,7 +241,7 @@ def nineSpecieAnalysis():
         {'name': "Parvulastra exigua", 'state': 60.84},
     ]
 
-    runAnalysis(species, percentDifference= 0.005, storeAllTrees=True, newickOutput=True, outputFile="copyNumberTrees.tree")
+    runAnalysis(species, percentDifference= 0.005, storeAllTrees=True, newickOutput=True, outputFile=None) #"copyNumberTrees.tree")
 
 if __name__ == "__main__":
     nineSpecieAnalysis()
