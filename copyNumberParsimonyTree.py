@@ -73,6 +73,11 @@ def setupTree(leafNodeList):
 
     return rootNode
 
+def printTreeWrapper(rootNode):
+    print("Begin printing tree.")
+    printTree(rootNode)
+    print("End printing tree.")
+
 def printTree(rootNode):
     #Prints the tree in postorder
     if 'left' in rootNode:
@@ -86,6 +91,42 @@ def printTree(rootNode):
 
     else:
         print("BacktrackState: " + str(rootNode['backtrackState']))
+
+def runAnalysis(species, storeAllTrees=False, percentDifference=0.025):
+    minScore = 9999
+    minTree = None
+    allTrees = []
+
+    for permutation in itertools.permutations(species):
+        tree = setupTree(permutation)
+        score = calculateParsimonyScore(tree)
+        print("Score for this run: " + str(score))
+        if storeAllTrees:
+            allTrees.append([tree, score])
+
+        if score < minScore:
+            minScore = score
+            minTree = tree
+
+    if storeAllTrees:
+        treesToPrint = [i for i in allTrees if abs(i[1] - minScore) <= (minScore*percentDifference)]
+
+        for i in treesToPrint:
+            print("Score for this tree: " + str(i[1]))
+            rootNode = backtrack(i[0])
+            printTreeWrapper(rootNode)
+
+        print("Smallest score: " + str(minScore))
+        print(str.format("Printing trees with score within {} of smallest score", str(minScore*percentDifference)))
+
+        print(str.format("Number of trees within threshold value: " + str(len(treesToPrint))))
+        print(str.format("Total number of trees generated: " + str(len(allTrees))))
+        print(str.format("Printing all trees within {}% of minimum parsimony score found.", str(percentDifference)))
+
+    else:
+        print("Backtracking and printing on tree with lowest score: " + str(minScore))
+        rootNode = backtrack(minTree)
+        printTreeWrapper(rootNode)
 
 ## TESTS
 
@@ -129,22 +170,7 @@ def nineSpecieAnalysis():
         {'name': "Parvulastra exigua", 'state': 60.84},
     ]
 
-    minScore = 9999
-    minTree = None
-
-    for permutation in itertools.permutations(species):
-        tree = setupTree(permutation)
-        score = calculateParsimonyScore(tree)
-        print("Score for this run: " + str(score))
-        if score < minScore:
-            minScore = score
-            minTree = tree
-
-    print("Backtracking and printing on tree with lowest score: " + str(minScore))
-
-    rootNode = backtrack(minTree)
-    printTree(rootNode)
-
+    runAnalysis(species, storeAllTrees=True)
 
 if __name__ == "__main__":
     nineSpecieAnalysis()
