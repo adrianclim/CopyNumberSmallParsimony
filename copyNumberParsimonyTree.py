@@ -112,8 +112,10 @@ def printTree(rootNode):
     else:
         print("BacktrackState: " + str(rootNode.backtrackstate))
 
-def bootstrapAnalysis(masterRootNode, treeSpace, counter = 0):
-    print("Calculating bootstrap for node: " + str(counter))
+nodeCounter = 0 #TODO write wrapper for this
+def bootstrapAnalysis(masterRootNode, treeSpace):
+    global nodeCounter
+    print("Calculating bootstrap for node: " + str(nodeCounter))
     totalBootStrapValue = 0
 
     if len(masterRootNode.descendants) > 0:
@@ -122,6 +124,7 @@ def bootstrapAnalysis(masterRootNode, treeSpace, counter = 0):
 
         counter = 0
         for tree in [k[0] for k in treeSpace]:
+            counter += 1
             print("Searching tree: " + str(counter))
             if searchForNodeWithChildren(tree, firstchildSet, secondChildSet):
                 totalBootStrapValue += 1
@@ -129,7 +132,8 @@ def bootstrapAnalysis(masterRootNode, treeSpace, counter = 0):
         masterRootNode.bootstrapValue = totalBootStrapValue
 
     for l in masterRootNode.descendants:
-        bootstrapAnalysis(l, treeSpace, counter + 1)
+        nodeCounter = nodeCounter + 1
+        bootstrapAnalysis(l, treeSpace)
 
 def searchForNodeWithChildren(currentNode, firstChildSet, secondChildSet):
     if currentNode.descendants is None or len(currentNode.descendants) == 0:
