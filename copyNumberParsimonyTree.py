@@ -138,12 +138,6 @@ def searchForNodeWithChildren(currentNode, firstChildSet, secondChildSet):
     leftCurrentNodeLeaves = set([i.name for i in currentNode.descendants[0].get_leaves()])
     rightcurrentNodeLeaves = set([j.name for j in currentNode.descendants[1].get_leaves()])
 
-    print(firstChildSet)
-    print(secondChildSet)
-    print(leftCurrentNodeLeaves)
-    print(rightcurrentNodeLeaves)
-    print("space")
-
     if leftCurrentNodeLeaves == firstChildSet and rightcurrentNodeLeaves == secondChildSet:
         print("match")
         return True
